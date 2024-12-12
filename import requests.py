@@ -47,14 +47,23 @@ def search_stackoverflow(word, pages=5):
     results = []
 
     for page in range(1, pages + 1):
-        response = requests.get(base_url, params={"tab": "newest", "page": page})
+        print(f"Fetching page {page}...")
+        response = requests.get(f"{base_url}?tab=newest&page={page}")
+        
+        if response.status_code != 200:
+            print(f"Failed to fetch page {page}: HTTP {response.status_code}")
+            continue
+        
         soup = BeautifulSoup(response.text, 'html.parser')
-
-        for question in soup.find_all('div', class_='question-summary'):
-            title_tag = question.find('a', class_='question-hyperlink')
-            if title_tag and word.lower() in title_tag.text.lower():
-                title = title_tag.text.strip()
-                link = "https://stackoverflow.com" + title_tag['href']
+        
+        # Ищем вопросы по их заголовкам
+        questions = soup.find_all('a', class_='s-link')  # Обновлённый класс для заголовков
+        print(f"Found {len(questions)} questions on page {page}.")
+        
+        for question in questions:
+            title = question.text.strip()
+            link = "https://stackoverflow.com" + question['href']
+            if word.lower() in title.lower():
                 results.append((title, link))
 
     print(f"Task 4: Found {len(results)} questions containing the word '{word}':")
@@ -63,13 +72,17 @@ def search_stackoverflow(word, pages=5):
     return results
 
 if __name__ == "__main__":
-    print("Starting data scraping tasks...")
+    print("Starting data scraping tasks...\n")
 
     external_links = find_external_links()
+    print("\n")
 
     total_comments = count_comments()
+    print("\n")
 
     unique_cities = find_cities()
+    print("\n")
 
     search_word = input("Enter a word to search on StackOverflow: ")
     stackoverflow_results = search_stackoverflow(search_word, pages=5)
+    print("\n")
