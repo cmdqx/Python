@@ -9,7 +9,7 @@ def find_external_links():
     links = set()
     for tag in soup.find_all('a', href=True):
         href = tag['href']
-        if href.startswith('http'):  # External links only
+        if href.startswith('http'): 
             links.add(href)
 
     print(f"Task 1: Found {len(links)} unique external links.")
@@ -32,7 +32,7 @@ def find_cities():
     soup = BeautifulSoup(response.text, 'html.parser')
 
     cities = set()
-    for tag in soup.find_all('span', class_='fc-black-500'):  # Adjust class if necessary
+    for tag in soup.find_all('span', class_='fc-black-500'): 
         city = tag.text.strip()
         if city:
             cities.add(city)
